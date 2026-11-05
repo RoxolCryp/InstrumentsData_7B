@@ -2,11 +2,12 @@ import { del } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { ensureTable, getSql } from "@/lib/db";
 
-type RouteContext = { params: { id: string } };
+type RouteContext = { params: Promise<{ id: string }> };
 
 export async function PUT(request: Request, { params }: RouteContext) {
   try {
-    const id = Number(params.id);
+    const { id: instrumentId } = await params;
+    const id = Number(instrumentId);
     if (!Number.isSafeInteger(id) || id < 1) {
       return NextResponse.json({ error: "Identificador inválido." }, { status: 400 });
     }
@@ -43,7 +44,8 @@ export async function PUT(request: Request, { params }: RouteContext) {
 
 export async function DELETE(_request: Request, { params }: RouteContext) {
   try {
-    const id = Number(params.id);
+    const { id: instrumentId } = await params;
+    const id = Number(instrumentId);
     if (!Number.isSafeInteger(id) || id < 1) {
       return NextResponse.json({ error: "Identificador inválido." }, { status: 400 });
     }
